@@ -73,13 +73,26 @@
 <body>
 
   <div id="app-container">
+    <!-- 魔術說明頁面 -->
     <div id="intro-screen">
-      <h1 style="color: #f1c40f; margin-bottom: 20px; font-size: clamp(1.8em, 6vw, 2.5em);">讀心術準備</h1>
+      <h1 style="color: #f1c40f; margin-bottom: 20px; font-size: clamp(1.8em, 6vw, 2.5em);">讀心術說明</h1>
       <div class="intro-text">
-        <p>準備進入讀心測驗...</p>
-        <p style="font-size:0.8em; color:#bdc3c7;">(第一次使用時，系統會要求「允許通知」以建立連結，請同意)</p>
+        <p>請在心中默想一張撲克牌。</p>
+        <p style="color:#f39c12; font-weight:bold;">過程中你可以故意說謊一次！</p>
+        <p>接下來畫面上會依序出現照片，請直接「觸控螢幕」來回答：</p>
+        <ul style="list-style-type: none; padding: 0;">
+          <li style="margin-bottom: 15px;">
+            <strong style="color:#2ecc71; font-size:1.1em;">[ 觸碰 右上角 ]</strong><br>代表數字與花色「完全一樣」(Y)
+          </li>
+          <li style="margin-bottom: 15px;">
+            <strong style="color:#3498db; font-size:1.1em;">[ 觸碰 左上角 ]</strong><br>代表有數字，但「花色不對」(？)
+          </li>
+          <li style="margin-bottom: 15px;">
+            <strong style="color:#e74c3c; font-size:1.1em;">[ 觸碰 下半部 ]</strong><br>代表完全沒有出現你想的數字(N)
+          </li>
+        </ul>
       </div>
-      <button class="start-btn" onclick="startMagic()">建立連結並開始</button>
+      <button class="start-btn" onclick="startMagic()">準備好了，開始</button>
     </div>
 
     <div id="card-area">
