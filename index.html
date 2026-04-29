@@ -76,7 +76,7 @@
     <div id="intro-screen">
       <h1 style="color: #f1c40f; margin-bottom: 20px; font-size: clamp(1.8em, 6vw, 2.5em);">讀心術準備</h1>
       <div class="intro-text">
-        <p>準備進入量子腦波連結...</p>
+        <p>準備進入讀心測驗...</p>
         <p style="font-size:0.8em; color:#bdc3c7;">(第一次使用時，系統會要求「允許通知」以建立連結，請同意)</p>
       </div>
       <button class="start-btn" onclick="startMagic()">建立連結並開始</button>
@@ -204,7 +204,7 @@
     let prob = `${finalSuitNum}.${lie}${rankStr}${d1}${d2}%`;
 
     // 顯示「假裝計算中」的畫面，製造鎖屏的時間空檔
-    resultArea.innerHTML = `<p style="color:#bdc3c7;">正在接收腦波連結...</p>`;
+    resultArea.innerHTML = `<p style="color:#bdc3c7;">請協助把手機上🔒且通知讀心者可以讀心了...</p>`;
     resultArea.style.display = 'block';
 
     // 延遲 3.5 秒發送通知到手錶
@@ -212,7 +212,7 @@
       sendToWatch(prob);
       // 手機上的畫面依然保持假畫面或顯示結果 (看你需求，這裡一併顯示)
       resultArea.innerHTML = `猜中觀眾牌可能機率：<span class="prob-text">${prob}</span>`;
-    }, 3500);
+    }, 5000);
   }
 
   // 發送推播通知的函數
