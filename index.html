@@ -4,214 +4,105 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>撲克牌讀心術</title>
+<!-- 宣告 PWA 的 manifest -->
+<link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
-<meta name="apple-mobile-web-app-title" content="讀心術">
+<meta name="apple-mobile-web-app-title" content="Mind Reader">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
 <style>
-  /* 表演用的極簡全螢幕風格 */
+  /* 維持極簡觸控風格 */
   body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     font-family: "Microsoft JhengHei", Arial, sans-serif;
-    background-color: #1a1a1a;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden; /* 完全鎖定螢幕，防止滑動 */
-    touch-action: none; /* 禁用雙指放大等瀏覽器預設手勢 */
+    background-color: #1a1a1a; color: #fff;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    height: 100vh; overflow: hidden; touch-action: none; 
   }
-  
   #app-container {
-    text-align: center;
-    width: 100%;
-    max-width: 600px; 
-    padding: 15px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 100%; 
+    text-align: center; width: 100%; max-width: 600px; 
+    padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; height: 100%; 
   }
-
-  /* 說明畫面設計 */
   #intro-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-    z-index: 10;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; z-index: 10;
   }
-
   .intro-text {
-    text-align: left;
-    font-size: clamp(1em, 4vw, 1.2em); 
-    line-height: 1.8;
-    max-width: 450px;
-    margin-bottom: 30px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 12px;
-    box-sizing: border-box;
-    width: 90%;
+    text-align: left; font-size: clamp(1em, 4vw, 1.2em); line-height: 1.8;
+    max-width: 450px; margin-bottom: 30px; background: rgba(255, 255, 255, 0.1);
+    padding: 20px; border-radius: 12px; box-sizing: border-box; width: 90%;
   }
-
   .start-btn {
-    padding: 15px 50px;
-    font-size: 1.5em;
-    font-weight: bold;
-    border-radius: 10px;
-    background-color: #f39c12;
-    color: white;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    transition: transform 0.1s;
-    position: relative;
-    z-index: 20;
+    padding: 15px 50px; font-size: 1.5em; font-weight: bold; border-radius: 10px;
+    background-color: #f39c12; color: white; border: none; cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.1s; position: relative; z-index: 20;
   }
   .start-btn:active { transform: scale(0.95); }
 
-  /* 單張照片顯示區 - 因為沒有按鈕了，可以讓照片盡可能大 */
   #card-area {
-    display: none; 
-    flex-direction: column; 
-    height: 100%; 
-    width: 100%;
-    justify-content: center;
-    align-items: center;
+    display: none; flex-direction: column; height: 100%; width: 100%; justify-content: center; align-items: center;
   }
-
   #current-photo {
-    width: 100%;
-    max-width: 500px;
-    max-height: 85vh; /* 照片高度極大化 */
-    object-fit: contain; 
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    transition: opacity 0.1s ease;
+    width: 100%; max-width: 500px; max-height: 85vh; object-fit: contain; 
+    border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); transition: opacity 0.1s ease;
   }
-
   .fade-out { opacity: 0; }
 
-  /* ========================================= */
-  /* ★ 隱形觸控網設計 ★ */
-  /* ========================================= */
+  /* 隱形觸控網 */
   #touch-overlay {
-    display: none; /* 預設隱藏，開始魔術後才開啟 */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 100; /* 覆蓋在照片最上方 */
+    display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 100; 
   }
-
   .touch-zone {
-    position: absolute;
-    /* 點擊時會有極度微弱的白色閃爍，讓魔術師跟觀眾有按下去的回饋感，但旁人看不見 */
-    -webkit-tap-highlight-color: transparent; 
+    position: absolute; -webkit-tap-highlight-color: transparent; 
   }
-  .touch-zone:active {
-    background-color: rgba(255, 255, 255, 0.03);
-  }
+  .touch-zone:active { background-color: rgba(255, 255, 255, 0.03); }
+  .zone-tl { top: 0; left: 0; width: 50vw; height: 50vh; }
+  .zone-tr { top: 0; left: 50vw; width: 50vw; height: 50vh; }
+  .zone-bottom { top: 50vh; left: 0; width: 100vw; height: 50vh; }
 
-  /* 左上角 (?) */
-  .zone-tl {
-    top: 0;
-    left: 0;
-    width: 50vw;
-    height: 50vh;
-  }
-  /* 右上角 (Y) */
-  .zone-tr {
-    top: 0;
-    left: 50vw;
-    width: 50vw;
-    height: 50vh;
-  }
-  /* 下半部 (N) */
-  .zone-bottom {
-    top: 50vh;
-    left: 0;
-    width: 100vw;
-    height: 50vh;
-  }
-
-  /* 結果呈現區 */
   #result {
-    display: none;
-    font-size: clamp(1.2em, 5vw, 1.8em); 
-    line-height: 1.6;
-    padding: 10px;
-    width: 100%;
-    box-sizing: border-box;
-    word-wrap: break-word; 
-    text-align: center;
-    z-index: 10;
+    display: none; font-size: clamp(1.2em, 5vw, 1.8em); line-height: 1.6;
+    padding: 10px; width: 100%; box-sizing: border-box; text-align: center; z-index: 10;
   }
-
   .prob-text {
-    font-size: clamp(1.8em, 9vw, 3em); 
-    font-weight: bold;
-    color: #f1c40f;
-    letter-spacing: 2px;
-    margin-top: 15px;
-    display: block;
-    word-break: break-all; 
+    font-size: clamp(1.8em, 9vw, 3em); font-weight: bold; color: #f1c40f;
+    letter-spacing: 2px; margin-top: 15px; display: block; word-break: break-all; 
   }
 </style>
 </head>
 <body>
 
   <div id="app-container">
-    
-    <!-- 魔術說明頁面 -->
     <div id="intro-screen">
-      <h1 style="color: #f1c40f; margin-bottom: 20px; font-size: clamp(1.8em, 6vw, 2.5em);">讀心術說明</h1>
+      <h1 style="color: #f1c40f; margin-bottom: 20px; font-size: clamp(1.8em, 6vw, 2.5em);">讀心術準備</h1>
       <div class="intro-text">
-        <p>請在心中默想一張撲克牌。</p>
-        <p style="color:#f39c12; font-weight:bold;">過程中你可以故意說謊一次！</p>
-        <p>接下來畫面上會依序出現照片，請直接「觸控螢幕」來回答：</p>
-        <ul style="list-style-type: none; padding: 0;">
-          <li style="margin-bottom: 15px;">
-            <strong style="color:#2ecc71; font-size:1.1em;">[ 觸碰 右上角 ]</strong><br>代表數字與花色「完全一樣」
-          </li>
-          <li style="margin-bottom: 15px;">
-            <strong style="color:#3498db; font-size:1.1em;">[ 觸碰 左上角 ]</strong><br>代表有數字，但「花色不對」
-          </li>
-          <li style="margin-bottom: 15px;">
-            <strong style="color:#e74c3c; font-size:1.1em;">[ 觸碰 下半部 ]</strong><br>代表完全沒有出現你想的數字
-          </li>
-        </ul>
+        <p>準備進入量子腦波連結...</p>
+        <p style="font-size:0.8em; color:#bdc3c7;">(第一次使用時，系統會要求「允許通知」以建立連結，請同意)</p>
       </div>
-      <button class="start-btn" onclick="startMagic()">準備好了，開始</button>
+      <button class="start-btn" onclick="startMagic()">建立連結並開始</button>
     </div>
 
-    <!-- 照片操作區 (隱藏觸控網在最上層) -->
     <div id="card-area">
-      <img id="current-photo" src="photo1.png" alt="撲克牌" onerror="this.src='https://placehold.co/500x700/333333/ffffff?text=Photo+1'">
+      <img id="current-photo" src="photo1.png" onerror="this.src='https://placehold.co/500x700/333333/ffffff?text=Photo+1'">
     </div>
 
-    <!-- 終極隱形觸控網 -->
     <div id="touch-overlay">
       <div class="touch-zone zone-tl" onclick="answer('?')"></div>
       <div class="touch-zone zone-tr" onclick="answer('Y')"></div>
       <div class="touch-zone zone-bottom" onclick="answer('N')"></div>
     </div>
 
-    <!-- 最終結果展示區 -->
     <div id="result"></div>
-
   </div>
 
 <script>
+  // 註冊 PWA Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(() => {
+      console.log("Service Worker 註冊成功");
+    });
+  }
+
   let currentCard = 1;
   const answers = {};
   const photoImg = document.getElementById('current-photo');
@@ -220,7 +111,6 @@
   const resultArea = document.getElementById('result');
   const introScreen = document.getElementById('intro-screen');
 
-  // 牌組資料庫
   const photosData = {
     1:['2S', '3D', '8S', '9C', '4D', '5C'],
     2:['3C', '6H', '7S', 'JS', '2H', '10D'],
@@ -230,43 +120,28 @@
     6:['3H', 'AH', '6D', '4C', 'KH', '10S', '8D'],
     7:['5D', 'AS', 'KS', '3C', '9H', '7H', 'JC']
   };
-
-  // 隱藏牌庫
   const missingCards =['2C', 'AC', 'QS', '9S', '4H', '10H', '7C'];
 
-  // 預載圖片
-  function preloadImages() {
-    for (let i = 1; i <= 7; i++) {
-      const img = new Image();
-      img.src = `photo${i}.png`; // 若需 .jpg 請改此處
-    }
-  }
-  preloadImages();
-
   function startMagic() {
+    // 要求推播權限 (魔術師專屬準備動作)
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
     introScreen.style.display = 'none';
     cardArea.style.display = 'flex';
-    // 開啟隱形觸控網
     touchOverlay.style.display = 'block';
   }
 
   function answer(btnType) {
-    // 記錄觸控對應的答案 ('Y', 'N', '?')
     answers[currentCard] = btnType;
     photoImg.classList.add('fade-out');
 
-    // 極速切換設定 (100毫秒)
     setTimeout(() => {
       currentCard++;
       if (currentCard <= 7) {
-        photoImg.src = `photo${currentCard}.png`; // 若需 .jpg 請改此處
+        photoImg.src = `photo${currentCard}.png`; 
         photoImg.onload = () => { photoImg.classList.remove('fade-out'); };
-        photoImg.onerror = function() {
-          this.src = `https://placehold.co/500x700/333333/ffffff?text=Photo+${currentCard}`;
-          this.classList.remove('fade-out');
-        };
       } else {
-        // 照片播完，關閉照片區與觸控網
         cardArea.style.display = 'none';
         touchOverlay.style.display = 'none';
         calculateResult();
@@ -274,119 +149,83 @@
     }, 100); 
   }
 
-  // 取得牌面點數
   function getRank(cardStr) {
     let r = cardStr.slice(0, -1);
-    if (r === 'A') return 1;
-    if (r === 'J') return 11;
-    if (r === 'Q') return 12;
-    if (r === 'K') return 13;
+    if (r === 'A') return 1; if (r === 'J') return 11;
+    if (r === 'Q') return 12; if (r === 'K') return 13;
     return parseInt(r);
   }
 
-  // 取得牌面花色
-  function getSuit(cardStr) {
-    return cardStr.slice(-1);
-  }
+  function getSuit(cardStr) { return cardStr.slice(-1); }
 
-  // 花色轉為規定的數字
   function suitToNum(suit) {
-    if (suit === 'C') return 1;
-    if (suit === 'H') return 2;
-    if (suit === 'S') return 3;
-    if (suit === 'D') return 4;
-    return 1; // 預設
+    if (suit === 'C') return 1; if (suit === 'H') return 2;
+    if (suit === 'S') return 3; if (suit === 'D') return 4; return 1; 
   }
 
   function calculateResult() {
-    // 轉換為布林值 (只要按 Y 或 ? 都代表該張照片「存在」該點數)
     let b =[];
-    for(let i = 1; i <= 7; i++) {
-      b[i] = (answers[i] === 'Y' || answers[i] === '?');
-    }
+    for(let i = 1; i <= 7; i++) b[i] = (answers[i] === 'Y' || answers[i] === '?');
 
-    // Hamming Code 糾錯方程式 (精準抓出說謊位置)
     let e1 = (b[1] + b[2] + b[3] + b[4]) % 2 !== 0;
     let e2 = (b[5] + b[2] + b[4] + b[7]) % 2 !== 0;
     let e3 = (b[6] + b[3] + b[4] + b[7]) % 2 !== 0;
     
     let lie = 0;
-    if (e1 && !e2 && !e3) lie = 1;
-    else if (e1 && e2 && !e3) lie = 2;
-    else if (e1 && !e2 && e3) lie = 3;
-    else if (e1 && e2 && e3) lie = 4;
-    else if (!e1 && e2 && !e3) lie = 5;
-    else if (!e1 && !e2 && e3) lie = 6;
+    if (e1 && !e2 && !e3) lie = 1; else if (e1 && e2 && !e3) lie = 2;
+    else if (e1 && !e2 && e3) lie = 3; else if (e1 && e2 && e3) lie = 4;
+    else if (!e1 && e2 && !e3) lie = 5; else if (!e1 && !e2 && e3) lie = 6;
     else if (!e1 && e2 && e3) lie = 7;
 
-    // 將謊言狀態翻轉回「沒有說謊」時的正確布林值
-    if (lie > 0) {
-      b[lie] = !b[lie];
-    }
-
-    // 計算真正的數字點數 (此時已經排除謊言)
+    if (lie > 0) b[lie] = !b[lie];
     let rank = (b[7] ? 1 : 0) + (b[2] ? 2 : 0) + (b[3] ? 4 : 0) + (b[4] ? 8 : 0);
 
-    // -- 尋找真實花色邏輯 --
-    let finalSuitNum = 1; 
-    let found = false;
+    let finalSuitNum = 1; let found = false;
 
-    // 1. 去尋找觀眾按過 'Y' (觸控右上角) 的照片
     for (let i = 1; i <= 7; i++) {
       if (answers[i] === 'Y') {
-        if (i === lie) continue; // 排除說謊的 Y
-        
+        if (i === lie) continue; 
         let card = photosData[i].find(c => getRank(c) === rank);
-        if (card) {
-          finalSuitNum = suitToNum(getSuit(card));
-          found = true;
-          break;
-        }
+        if (card) { finalSuitNum = suitToNum(getSuit(card)); found = true; break; }
       }
     }
-
-    // 2. 備援：如果上面找不到 Y，但系統有抓到說謊位置 (lie > 0)，優先去「說謊照片」找花色
     if (!found && lie > 0) {
       let card = photosData[lie].find(c => getRank(c) === rank);
-      if (card) {
-        finalSuitNum = suitToNum(getSuit(card));
-        found = true;
-      }
+      if (card) { finalSuitNum = suitToNum(getSuit(card)); found = true; }
     }
-
-    // 3. 隱藏牌庫啟動 (如果連說謊的照片裡都沒有，代表它是 7 張隱藏牌)
     if (!found) {
       let missingCard = missingCards.find(c => getRank(c) === rank);
-      if (missingCard) {
-        finalSuitNum = suitToNum(getSuit(missingCard));
-        found = true;
-      }
+      if (missingCard) { finalSuitNum = suitToNum(getSuit(missingCard)); found = true; }
     }
 
-    // 4. 極限防呆備援 (確保程式永遠不會出錯跳出)
-    if (!found) {
-      for (let i = 1; i <= 7; i++) {
-        let card = photosData[i].find(c => getRank(c) === rank);
-        if (card) {
-          finalSuitNum = suitToNum(getSuit(card));
-          break;
-        }
-      }
-    }
-
-    // -- 組合最終你規定的格式 --
     let rankStr = rank.toString().padStart(2, '0');
     let d1 = Math.floor(Math.random() * 10);
     let d2 = Math.floor(Math.random() * 10);
-    
-    // 結果：花色(1位) + 謊言位置(1位) + . + 數字(2位) + 隨機亂數(2位) + %
     let prob = `${finalSuitNum}.${lie}${rankStr}${d1}${d2}%`;
 
-    resultArea.innerHTML = ` 
-      猜中觀眾牌可能機率：
-      <span class="prob-text">${prob}</span>
-    `;
+    // 顯示「假裝計算中」的畫面，製造鎖屏的時間空檔
+    resultArea.innerHTML = `<p style="color:#bdc3c7;">正在接收腦波連結...</p>`;
     resultArea.style.display = 'block';
+
+    // 延遲 3.5 秒發送通知到手錶
+    setTimeout(() => {
+      sendToWatch(prob);
+      // 手機上的畫面依然保持假畫面或顯示結果 (看你需求，這裡一併顯示)
+      resultArea.innerHTML = `猜中觀眾牌可能機率：<span class="prob-text">${prob}</span>`;
+    }, 3500);
+  }
+
+  // 發送推播通知的函數
+  function sendToWatch(resultText) {
+    if (Notification.permission === "granted") {
+      navigator.serviceWorker.ready.then(function(registration) {
+        registration.showNotification('腦波解碼完成', {
+          body: `目標數據: ${resultText}`,
+          icon: 'icon.png',
+          vibrate: [200, 100, 200]
+        });
+      });
+    }
   }
 </script>
 
