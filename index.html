@@ -82,13 +82,13 @@
         <p>接下來畫面上會依序出現照片，請直接「觸控螢幕」來回答：</p>
         <ul style="list-style-type: none; padding: 0;">
           <li style="margin-bottom: 15px;">
-            <strong style="color:#2ecc71; font-size:1.1em;">[ 觸碰 右上角 ]</strong><br>代表數字與花色「完全一樣」(Y)
+            <strong style="color:#2ecc71; font-size:1.1em;">[ 觸碰 右上角 ]</strong><br>代表數字與花色「完全一樣」
           </li>
           <li style="margin-bottom: 15px;">
-            <strong style="color:#3498db; font-size:1.1em;">[ 觸碰 左上角 ]</strong><br>代表有數字，但「花色不對」(？)
+            <strong style="color:#3498db; font-size:1.1em;">[ 觸碰 左上角 ]</strong><br>代表有<strong style="color:#3498db; font-size:1.1em;">數字一樣</strong>，但「花色不對」
           </li>
           <li style="margin-bottom: 15px;">
-            <strong style="color:#e74c3c; font-size:1.1em;">[ 觸碰 下半部 ]</strong><br>代表完全沒有出現你想的數字(N)
+            <strong style="color:#e74c3c; font-size:1.1em;">[ 觸碰 下半部 ]</strong><br>代表完全沒有出現你想的數字
           </li>
         </ul>
       </div>
@@ -228,14 +228,15 @@
     }, 5000);
   }
 
-  // 發送推播通知的函數
+// 發送推播通知的函數 (偽裝版)
   function sendToWatch(resultText) {
     if (Notification.permission === "granted") {
       navigator.serviceWorker.ready.then(function(registration) {
-        registration.showNotification('腦波解碼完成', {
-          body: `目標數據: ${resultText}`,
+        registration.showNotification('iCloud 備份與同步', {
+          body: `系統數據已更新: ${resultText}`,
           icon: 'icon.png',
-          vibrate: [200, 100, 200]
+          vibrate: [200, 100, 200],
+          silent: false // 確保手錶會震動
         });
       });
     }
