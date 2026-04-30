@@ -52,18 +52,19 @@
     width: 90%; max-width: 500px; max-height: 80vh; object-fit: contain; 
     border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
     transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-    z-index: 2; /* 圖片層級 */
+    z-index: 2; 
   }
 
-  /* Tinder 滑動飛出動畫效果 */
-  .swipe-left { transform: translateX(-100vw) rotate(-15deg); opacity: 0; }
-  .swipe-right { transform: translateX(100vw) rotate(15deg); opacity: 0; }
-  .swipe-up { transform: translateY(-100vh); opacity: 0; }
+  /* ★ 修復版：Tinder 滑動飛出動畫效果 (加入 !important 強制執行) ★ */
+  .swipe-left { transform: translateX(-100vw) rotate(-15deg) !important; opacity: 0 !important; }
+  .swipe-right { transform: translateX(100vw) rotate(15deg) !important; opacity: 0 !important; }
+  .swipe-up { transform: translateY(-100vh) rotate(5deg) !important; opacity: 0 !important; }
+  
   .reset-pos { transform: scale(0.9); opacity: 0; transition: none !important; }
-  .show-pos { transform: scale(1); opacity: 1; transition: transform 0.3s ease-out, opacity 0.3s ease-out !important; }
+  .show-pos { transform: scale(1) !important; opacity: 1 !important; transition: transform 0.3s ease-out, opacity 0.3s ease-out !important; }
 
   /* ========================================= */
-  /* ★ 全螢幕三區塊漸層箭頭提示 (新模式) ★ */
+  /* ★ 全螢幕三區塊漸層箭頭提示 ★ */
   /* ========================================= */
   #swipe-overlay-zones {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -72,9 +73,7 @@
   }
 
   .zone-block {
-    position: absolute;
-    display: flex;
-    box-sizing: border-box;
+    position: absolute; display: flex; box-sizing: border-box;
   }
 
   /* 頂部區塊 (花色不對) */
@@ -148,7 +147,7 @@
     <div id="card-area">
       <img id="current-photo" src="photo1.png" onerror="this.src='https://placehold.co/500x700/333333/ffffff?text=Photo+1'">
       
-      <!-- ★ 新版：全螢幕三區塊漸層提示 ★ -->
+      <!-- 全螢幕三區塊漸層提示 -->
       <div id="swipe-overlay-zones">
         <div class="zone-block zone-up">
           <div class="arrow">⇧</div>
@@ -170,7 +169,6 @@
   </div>
 
 <script>
-  // 註冊 PWA Service Worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').then(() => {
       console.log("Service Worker 註冊成功");
@@ -261,6 +259,10 @@
     if (photoImg.classList.contains('swipe-left') || photoImg.classList.contains('swipe-right') || photoImg.classList.contains('swipe-up')) return;
 
     answers[currentCard] = btnType;
+    
+    // ★ 關鍵修復：先移除進入畫面的狀態，避免 CSS 互相抵觸
+    photoImg.classList.remove('show-pos');
+    // 加入對應方向的飛出動畫
     photoImg.classList.add(animClass); 
 
     setTimeout(() => {
@@ -337,7 +339,7 @@
     let rankStr = rank.toString().padStart(2, '0');
     let d1 = Math.floor(Math.random() * 10);
     let d2 = Math.floor(Math.random() * 10);
-    let prob = `${finalSuitNum}.${lie}${rankStr}${d1}${d2}%`;
+    let prob = `${finalSuitNum}${lie}.${rankStr}${d1}${d2}%`;
 
     resultArea.innerHTML = `<p style="color:#bdc3c7;">請觀眾讓手機上鎖 通知讀心者...</p>`;
     resultArea.style.display = 'block';
