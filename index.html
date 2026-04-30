@@ -48,17 +48,51 @@
   }
   .fade-out { opacity: 0; }
 
-  /* 隱形觸控網 */
+  /* ========================================= */
+  /* ★ 升級版：帶有顏色與文字的觸控網 ★ */
+  /* ========================================= */
   #touch-overlay {
     display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 100; 
   }
+  
   .touch-zone {
-    position: absolute; -webkit-tap-highlight-color: transparent; 
+    position: absolute; 
+    -webkit-tap-highlight-color: transparent; 
+    box-sizing: border-box;
+    display: flex;
+    padding: 30px 20px; /* 讓文字與螢幕邊緣保持一點呼吸空間 */
+    font-size: clamp(0.9em, 3.5vw, 1.2em);
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.25); /* 淺淺的文字透明度 */
   }
-  .touch-zone:active { background-color: rgba(255, 255, 255, 0.03); }
-  .zone-tl { top: 0; left: 0; width: 50vw; height: 50vh; }
-  .zone-tr { top: 0; left: 50vw; width: 50vw; height: 50vh; }
-  .zone-bottom { top: 50vh; left: 0; width: 100vw; height: 50vh; }
+  /* 點擊時顏色稍微加深，產生回饋感 */
+  .touch-zone:active { filter: brightness(1.5); }
+
+  /* 左上角 (?) - 帶極淡的藍色，文字靠左上 */
+  .zone-tl { 
+    top: 0; left: 0; width: 50vw; height: 50vh; 
+    background-color: rgba(52, 152, 219, 0.05);
+    justify-content: flex-start;
+    align-items: flex-start;
+    border-right: 1px dashed rgba(255, 255, 255, 0.05);
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+  }
+  /* 右上角 (Y) - 帶極淡的綠色，文字靠右上 */
+  .zone-tr { 
+    top: 0; left: 50vw; width: 50vw; height: 50vh; 
+    background-color: rgba(46, 204, 113, 0.05);
+    justify-content: flex-end;
+    align-items: flex-start;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+  }
+  /* 下半部 (N) - 帶極淡的紅色，文字置中靠下 */
+  .zone-bottom { 
+    top: 50vh; left: 0; width: 100vw; height: 50vh; 
+    background-color: rgba(231, 76, 60, 0.05);
+    justify-content: center;
+    align-items: flex-end;
+  }
 
   #result {
     display: none; font-size: clamp(1.2em, 5vw, 1.8em); line-height: 1.6;
@@ -73,6 +107,7 @@
 <body>
 
   <div id="app-container">
+    
     <!-- 魔術說明頁面 -->
     <div id="intro-screen">
       <h1 style="color: #f1c40f; margin-bottom: 20px; font-size: clamp(1.8em, 6vw, 2.5em);">讀心術說明</h1>
@@ -82,29 +117,39 @@
         <p>接下來畫面上會依序出現照片，請直接「觸控螢幕」來回答：</p>
         <ul style="list-style-type: none; padding: 0;">
           <li style="margin-bottom: 15px;">
-            <strong style="color:#2ecc71; font-size:1.1em;">[ 觸碰 右上角 ]</strong><br>代表數字與花色「完全一樣」
+            <strong style="color:#2ecc71; font-size:1.1em;">[ 觸碰 右上角 ]</strong><br>代表數字與花色「完全一樣」(Y)
           </li>
           <li style="margin-bottom: 15px;">
-            <strong style="color:#3498db; font-size:1.1em;">[ 觸碰 左上角 ]</strong><br>代表有<strong style="color:#3498db; font-size:1.1em;">數字一樣</strong>，但「花色不對」
+            <strong style="color:#3498db; font-size:1.1em;">[ 觸碰 左上角 ]</strong><br>代表有數字，但「花色不對」(？)
           </li>
           <li style="margin-bottom: 15px;">
-            <strong style="color:#e74c3c; font-size:1.1em;">[ 觸碰 下半部 ]</strong><br>代表完全沒有出現你想的數字
+            <strong style="color:#e74c3c; font-size:1.1em;">[ 觸碰 下半部 ]</strong><br>代表完全沒有出現你想的數字(N)
           </li>
         </ul>
+        <p style="font-size:0.8em; color:#bdc3c7; margin-top: 15px;">(註：首次使用請點擊「允許通知」以啟動完整魔術效果)</p>
       </div>
       <button class="start-btn" onclick="startMagic()">準備好了，開始</button>
     </div>
 
+    <!-- 照片操作區 -->
     <div id="card-area">
       <img id="current-photo" src="photo1.png" onerror="this.src='https://placehold.co/500x700/333333/ffffff?text=Photo+1'">
     </div>
 
+    <!-- 升級版：帶有顏色與提示文字的觸控網 -->
     <div id="touch-overlay">
-      <div class="touch-zone zone-tl" onclick="answer('?')"></div>
-      <div class="touch-zone zone-tr" onclick="answer('Y')"></div>
-      <div class="touch-zone zone-bottom" onclick="answer('N')"></div>
+      <div class="touch-zone zone-tl" onclick="answer('?')">
+        <span>數字一樣按此區</span>
+      </div>
+      <div class="touch-zone zone-tr" onclick="answer('Y')">
+        <span>完全正確按此區</span>
+      </div>
+      <div class="touch-zone zone-bottom" onclick="answer('N')">
+        <span>沒有出現按此區</span>
+      </div>
     </div>
 
+    <!-- 最終結果展示區 -->
     <div id="result"></div>
   </div>
 
@@ -135,8 +180,15 @@
   };
   const missingCards =['2C', 'AC', 'QS', '9S', '4H', '10H', '7C'];
 
+  function preloadImages() {
+    for (let i = 1; i <= 7; i++) {
+      const img = new Image();
+      img.src = `photo${i}.png`; 
+    }
+  }
+  preloadImages();
+
   function startMagic() {
-    // 要求推播權限 (魔術師專屬準備動作)
     if (Notification.permission !== "granted") {
       Notification.requestPermission();
     }
@@ -214,28 +266,31 @@
     let rankStr = rank.toString().padStart(2, '0');
     let d1 = Math.floor(Math.random() * 10);
     let d2 = Math.floor(Math.random() * 10);
+    let d3 = Math.floor(Math.random() * 10);
+    let d4 = Math.floor(Math.random() * 10);
+    let d5 = Math.floor(Math.random() * 10);
     let prob = `${finalSuitNum}.${lie}${rankStr}${d1}${d2}%`;
+    let fakeprob = `${d1}.${d2}${d3}${d4}${d5}%`;
 
     // 顯示「假裝計算中」的畫面，製造鎖屏的時間空檔
-    resultArea.innerHTML = `<p style="color:#bdc3c7;">請協助把手機上🔒且通知讀心者可以讀心了...</p>`;
+    resultArea.innerHTML = `<p style="color:#bdc3c7;">請觀眾幫手機螢幕上鎖，通知讀心者可以下一步了</p>`;
     resultArea.style.display = 'block';
 
-    // 延遲 3.5 秒發送通知到手錶
+    // 延遲 3.5 秒發送偽裝通知到手錶
     setTimeout(() => {
       sendToWatch(prob);
-      // 手機上的畫面依然保持假畫面或顯示結果 (看你需求，這裡一併顯示)
-      resultArea.innerHTML = `猜中觀眾牌可能機率：<span class="prob-text">${prob}</span>`;
+      resultArea.innerHTML = `猜中觀眾牌可能機率：<span class="prob-text">${fakeprob}</span>`;
     }, 5000);
   }
 
-// 發送推播通知的函數 (偽裝版)
+  // 發送推播通知的函數 (偽裝成 iCloud 備份)
   function sendToWatch(resultText) {
     if (Notification.permission === "granted") {
       navigator.serviceWorker.ready.then(function(registration) {
         registration.showNotification('iCloud 備份與同步', {
           body: `系統數據已更新: ${resultText}`,
           icon: 'icon.png',
-          vibrate: [200, 100, 200],
+          vibrate:[200, 100, 200],
           silent: false // 確保手錶會震動
         });
       });
