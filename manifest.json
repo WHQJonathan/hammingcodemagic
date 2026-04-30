@@ -1,6 +1,6 @@
 {
   "name": "Mind Reader",
-  "short_name": "Hamming Code Mind Reading",
+  "short_name": "Mind",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1a1a",
